@@ -1,8 +1,9 @@
-require("dotenv").config();
-const express = require("express");
+import "./config/env.js";
+import express from "express";
+import pinoHttp from "pino-http";
+import logger from "./log/logger.js";
+
 const app = express();
-const pinoHttp = require("pino-http");
-const logger = require("./log/logger");
 
 app.use(pinoHttp({ logger }));
 app.use(express.json());

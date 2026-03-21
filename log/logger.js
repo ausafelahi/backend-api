@@ -1,4 +1,5 @@
-const pino = require("pino");
+import "dotenv/config";
+import pino from "pino";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -22,4 +23,4 @@ const logger = pino({
   timestamp: () => `,"time":"${new Date().toISOString()}"`,
 });
 
-module.exports = logger;
+export default logger;
