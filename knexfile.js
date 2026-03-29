@@ -11,7 +11,10 @@ export default {
       password: process.env.DB_PASSWORD,
     },
     pool: { min: 2, max: 10 },
-    migrations: { directory: "./src/db/migrations" },
-    seeds: { directory: "./src/db/seeds" },
+    migrations: {
+      directory: "./db/migrations",
+      loadExtensions: [".js"],
+    },
+    seeds: { directory: "./db/seeds" },
   },
 };
