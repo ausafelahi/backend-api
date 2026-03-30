@@ -1,5 +1,5 @@
 import { rateLimit } from "express-rate-limit";
-import logger from "../logger.js";
+import logger from "../log/logger.js";
 
 export function createRateLimiter({ windowMs = 60_000, max = 100 } = {}) {
   return rateLimit({
