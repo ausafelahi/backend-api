@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { AppError } from "../utils/AppError";
+import { AppError } from "../utils/AppError.js";
 import { doctorStore, registrationStore } from "../store/index.js";
-import logger from "../log/logger.js";
 
 const SALT_ROUNDS = 10;
 
