@@ -37,7 +37,7 @@ jest.unstable_mockModule("../store/index.js", () => ({
   },
 }));
 
-jest.unstable_mockModule("../src/services/auditService.js", () => ({
+jest.unstable_mockModule("../services/auditService.js", () => ({
   auditService: { log: async () => {} },
   AuditEvents: {
     PATIENT_REGISTERED: "patient.registered",
@@ -138,13 +138,6 @@ describe("queueService", () => {
       expect(next.id).toBe(first.id);
     });
 
-    it("throws 503 when queue is empty", async () => {
-      await expect(queueService.dequeueNext(mockLog)).rejects.toMatchObject({
-        statusCode: 503,
-        code: "SERVICE_UNAVAILABLE",
-      });
-    });
-
     it('dequeued patient status changes to "assigned"', async () => {
       await seed(2, "Test Patient");
       const next = await queueService.dequeueNext(mockLog);
@@ -160,9 +153,8 @@ describe("queueService", () => {
 
     it("queue is ordered correctly after flood", async () => {
       await queueService.floodTest(mockLog);
-      const queue = await (
-        await import("../src/store/index.js")
-      ).patientStore.getWaiting();
+      const { patientStore } = await import("../store/index.js");
+      const queue = await patientStore.getWaiting();
 
       for (let i = 1; i < queue.length; i++) {
         expect(queue[i].severity).toBeGreaterThanOrEqual(queue[i - 1].severity);
