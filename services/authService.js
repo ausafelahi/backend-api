@@ -14,30 +14,31 @@ export const authService = {
     if (!regEntry) {
       logger.warn(
         { registrationNumber },
-        "Signup with unrecognized registration number",
+        "Signup with unrecognised PMDC number",
       );
-      AppError.badRequest(
-        "Registration number not found in the PMDC registry. Contact support if you believe this is an error.",
+      throw Errors.badRequest(
+        "This registration number does not exist in the PMDC registry. Contact support if you believe this is an error.",
       );
     }
 
     if (regEntry.used) {
       logger.warn(
         { registrationNumber },
-        "Signup with already-used registration number",
+        "Signup with already-claimed PMDC number",
       );
-      AppError.conflict(
-        "This registration number is already associated with an account.",
+      throw Errors.conflict(
+        "This PMDC registration number is already linked to an existing account.",
       );
     }
 
     const existing = await doctorStore.findByEmail(email);
     if (existing) {
       logger.warn({ email }, "Signup with duplicate email");
-      AppError.conflict("An account with this email already exists.");
+      throw Errors.conflict("An account with this email already exists.");
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const verifiedAt = new Date();
 
     const doctor = await doctorStore.create({
       name,
@@ -45,20 +46,22 @@ export const authService = {
       password_hash: passwordHash,
       specialization,
       registration_number: registrationNumber,
+      verified: true,
+      verified_at: verifiedAt,
       available: false,
     });
 
     await registrationStore.markUsed(registrationNumber, doctor.id);
 
     logger.info(
-      { doctorId: doctor.id, registrationNumber },
-      "New doctor registered",
+      { doctorId: doctor.id, registrationNumber, verifiedAt },
+      "New doctor registered and PMDC verified",
     );
 
     const token = jwt.sign(
-      { id: doctor.id, name: doctor.name, email: doctor.email },
+      { id: doctor.id, name: doctor.name, email: doctor.email, verified: true },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
+      { expiresIn: process.env.JWT_EXPIRES_IN || "8h" },
     );
 
     return {
@@ -69,6 +72,8 @@ export const authService = {
         email: doctor.email,
         specialization: doctor.specialization,
         registrationNumber: doctor.registration_number,
+        verified: doctor.verified,
+        verifiedAt: doctor.verified_at,
       },
     };
   },

@@ -27,9 +27,9 @@ app.use(
 
 app.use(timeout(5000));
 
-app.use("/patients", patientRoutes);
-app.use("/doctors", doctorRoutes);
-app.use("/queue", queueRoutes);
+app.use("/api/patients", patientRoutes);
+app.use("/api/doctors", doctorRoutes);
+app.use("/api/queue", queueRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -41,7 +41,7 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   logger.info(
